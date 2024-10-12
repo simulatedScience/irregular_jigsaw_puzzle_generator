@@ -1,0 +1,4 @@
+numpy==2.1.2 # efficient handling of many points and calculations
+scipy==1.14.1 # Voronoi tessellation
+matplotlib==3.9.2 # visualization
+shapely==2.0.6 # polygon functions
