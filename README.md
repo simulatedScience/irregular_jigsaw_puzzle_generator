@@ -33,4 +33,5 @@ Steps 8 and 9 are currently the only way to get non-convex shapes.
   Since we store polygons, we should easily be able to iterate over edges, calculate their length and place a scaled, randomly oriented connector if the length is above a certain threshold. It may be difficult to avoid placing two connectors per edge.
 - [ ] in steps 8 and 9, merge the adjacent piece with the longest shared edge, not to the one with the smallest area (current implementation)  
   This modification requires finding the maximum length of shared edges between two polygons. Due to steps 6 (with multiple points) and 7 & 8, polygons are not necessarily convex, so adjacent polygons can share multiple edges.
+- [ ] split code into multiple files
 

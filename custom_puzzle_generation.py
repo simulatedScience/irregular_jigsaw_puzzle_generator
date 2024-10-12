@@ -1,3 +1,11 @@
+"""
+This module provides tools to generate custom jigsaw puzzles with irregular pieces using Voronoi diagrams.
+
+Call generate_puzzle() to generate a new puzzle layout.
+
+Author: Sebastian Jost using GPT-4o (13.10.2024)
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import Voronoi, voronoi_plot_2d
