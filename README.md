@@ -34,4 +34,5 @@ Steps 8 and 9 are currently the only way to get non-convex shapes.
 - [ ] in steps 8 and 9, merge the adjacent piece with the longest shared edge, not to the one with the smallest area (current implementation)  
   This modification requires finding the maximum length of shared edges between two polygons. Due to steps 6 (with multiple points) and 7 & 8, polygons are not necessarily convex, so adjacent polygons can share multiple edges.
 - [ ] split code into multiple files
-
+- [ ] avoid pieces with too thin sections:  
+  For each piece calculate the minimum distance between points on the boundary that are at least 2 points apart (i.e. polygon needs at least 6 vertices). If this distance is below a threshold, merge the piece with the neighbour sharing an edge connected to one of the problematic points.
