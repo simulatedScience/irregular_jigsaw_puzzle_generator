@@ -464,17 +464,17 @@ def generate_puzzle(
 # Example usage:
 if __name__ == "__main__":
     seed = np.random.randint(0, 1000)
-    # seed = 5
+    # seed = 205
     np.random.seed(seed)
     print(f"Random seed: {seed}")
     ##### settings for large puzzle:
-    grid_size = (50, 40)
+    grid_size = (35, 25)
     num_points_per_cell = 1
     width, height = 70.0, 50.0
     refinement_steps = 20
     min_area = .5
     max_aspect_ratio = 2.0
-    target_count = 800
+    target_count = 500
     ##### test settings for small puzzle:
     # grid_size = (15, 10)
     # num_points_per_cell = 1
@@ -505,15 +505,17 @@ if __name__ == "__main__":
                 edge[:, 0],
                 edge[:, 1],
                 color="#000",
+                linewidth=0.5,
             )
             continue
         draw_connector(
             edge[0, :],
             edge[1, :],
             show_plot=False,
-            color="#000",
             min_scale=0.7,
-            max_scale=1.5,
+            max_scale=1.1,
+            color="#000",
+            linewidth=0.5,
         )
-    plt.tight_layout()
+    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
     plt.show()

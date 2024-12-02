@@ -35,3 +35,4 @@ Steps 8 and 9 are currently the only way to get non-convex shapes.
 - [X] split code into multiple files
 - [ ] avoid pieces with too thin sections:  
   For each piece calculate the minimum distance between points on the boundary that are at least 2 points apart (i.e. polygon needs at least 6 vertices). If this distance is below a threshold, merge the piece with the neighbour sharing an edge connected to one of the problematic points.
+
