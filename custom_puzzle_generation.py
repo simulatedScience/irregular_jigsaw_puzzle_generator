@@ -12,42 +12,18 @@ from scipy.spatial import Voronoi, voronoi_plot_2d
 from shapely.geometry import Polygon, Point, MultiPolygon
 from shapely.ops import unary_union
 from collections import defaultdict
-from typing import List, Dict, Tuple, Optional
+
+from VoronoiCell import VoronoiCell, plot_polygons, debug_plot
+from reduce_to_edges import reduce_to_edges, plot_puzzle_edges, on_puzzle_edge
+from connector_placement import draw_connector
 
 DEBUG = False
 
 FAR_POINT_DISTANCE = 10000
 
-class VoronoiCell:
-    """
-    Helper class to save Voronoi cell polygons with neighbors and a unique ID.
-    """
-    def __init__(self, polygon: Polygon, cell_id: int):
-        self.polygon = polygon
-        self.id = cell_id
-        self.neighbors = set()
-    
-    def __str__(self):
-        return f"Cell {self.id} with {len(self.neighbors)} neighbors."
-
-    def set_neighbors(self, neighbors: set[int]):
-        """
-        Set the neighbors of the cell.
-
-        Args:
-            neighbors (set[int]): Set of neighboring cell IDs.
-        """
-        self.neighbors: set[int] = {int(n) for n in neighbors}
-
-    def plot(self, all_polygons: dict[int, "VoronoiCell"]):
-        """
-        Plot self and neighbors using matplotlib.
-        """
-        plot_polygons([self] + [all_polygons[n] for n in self.neighbors])
-
 # --- Utility Functions ---
 
-def generate_random_points(grid_size: Tuple[int, int], num_points: int) -> np.ndarray:
+def generate_random_points(grid_size: tuple[int, int], num_points: int) -> np.ndarray:
     """
     Generate random points within each cell of the grid with padding.
     
@@ -77,7 +53,7 @@ def generate_random_points(grid_size: Tuple[int, int], num_points: int) -> np.nd
 
     return np.array(points)
 
-def scale_to_bounds(points: np.ndarray, grid_size: Tuple[int, int], width: float, height: float) -> np.ndarray:
+def scale_to_bounds(points: np.ndarray, grid_size: tuple[int, int], width: float, height: float) -> np.ndarray:
     """
     Scale the points to fit within the given width and height.
 
@@ -110,7 +86,7 @@ def generate_voronoi(points: np.ndarray) -> Voronoi:
     """
     return Voronoi(points)
 
-def clip_voronoi(vor: Voronoi, width: float, height: float) -> List[Polygon]:
+def clip_voronoi(vor: Voronoi, width: float, height: float) -> list[Polygon]:
     """
     Clip the Voronoi diagram to fit within a bounding box of given width and height.
 
@@ -120,7 +96,7 @@ def clip_voronoi(vor: Voronoi, width: float, height: float) -> List[Polygon]:
         height (float): Height of the puzzle.
 
     Returns:
-        List[Polygon]: List of polygons representing the clipped Voronoi cells.
+        list[Polygon]: List of polygons representing the clipped Voronoi cells.
     """
     bounding_box = Polygon([(0, 0), (0, height), (width, height), (width, 0)])
     polygons = []
@@ -136,12 +112,12 @@ def clip_voronoi(vor: Voronoi, width: float, height: float) -> List[Polygon]:
 
     return polygons
 
-def reduce_to_target_count(cells: dict[int, VoronoiCell], target_count: int, max_index: int) -> Tuple[List[VoronoiCell], int]:
+def reduce_to_target_count(cells: dict[int, VoronoiCell], target_count: int, max_index: int) -> tuple[list[VoronoiCell], int]:
     """
     Reduce the number of Voronoi cells to the target count by merging cells.
 
     Args:
-        cells (List[VoronoiCell]): List of Voronoi cells.
+        cells (list[VoronoiCell]): List of Voronoi cells.
         target_count (int): Target number of pieces.
         max_index (int): Current maximum index.
 
@@ -190,13 +166,13 @@ def reduce_to_target_count(cells: dict[int, VoronoiCell], target_count: int, max
 
     return merged_cells, max_index
 
-def get_smallest_neighbor(poly: Polygon, polygons: List[Polygon]) -> Polygon:
+def get_smallest_neighbor(poly: Polygon, polygons: list[Polygon]) -> Polygon:
     """
     Get the smallest neighboring polygon for a given polygon.
     
     Args:
         poly (Polygon): The polygon to find the neighbor for.
-        polygons (List[Polygon]): List of available polygons to choose from.
+        polygons (list[Polygon]): List of available polygons to choose from.
 
     Returns:
         Polygon: The smallest neighboring polygon.
@@ -206,7 +182,7 @@ def get_smallest_neighbor(poly: Polygon, polygons: List[Polygon]) -> Polygon:
         return min(neighbors, key=lambda p: p.area)
     return None
 
-def extract_voronoi_cells(vor: Voronoi, width: float, height: float) -> Tuple[List[VoronoiCell], Dict[int, set]]:
+def extract_voronoi_cells(vor: Voronoi, width: float, height: float) -> tuple[list[VoronoiCell], dict[int, set]]:
     """
     Extract the Voronoi cells and their neighbor relationships from the Voronoi diagram.
 
@@ -347,7 +323,7 @@ def update_neighbors(all_cells: dict[int, VoronoiCell], cell1_id: int, cell2_id:
         all_cells[neighbor_id].set_neighbors(new_neighbors)
         # print(f"new_neighbors of {neighbor_id}: {new_neighbors}")
 
-def merge_small_pieces(cells: dict[int, VoronoiCell], min_area: float, max_index: int) -> Tuple[List[VoronoiCell], int]:
+def merge_small_pieces(cells: dict[int, VoronoiCell], min_area: float, max_index: int) -> tuple[list[VoronoiCell], int]:
     """
     Merge small Voronoi cells with their neighbors to ensure a minimum surface area.
 
@@ -391,7 +367,7 @@ def merge_small_pieces(cells: dict[int, VoronoiCell], min_area: float, max_index
 
     return merged_cells, max_index
 
-def refine_voronoi(cells: dict[int, VoronoiCell], refinement_steps: int, width: float, height: float) -> List[Polygon]:
+def refine_voronoi(cells: dict[int, VoronoiCell], refinement_steps: int, width: float, height: float) -> list[Polygon]:
     """
     Refine Voronoi cells by generating random points within them and recomputing Voronoi.
 
@@ -402,7 +378,7 @@ def refine_voronoi(cells: dict[int, VoronoiCell], refinement_steps: int, width: 
         height (float): Height of the puzzle.
 
     Returns:
-        List[Polygon]: Refined list of polygons after subdivision.
+        list[Polygon]: Refined list of polygons after subdivision.
     """
     for _ in range(refinement_steps):
         new_points = []
@@ -427,69 +403,18 @@ def refine_voronoi(cells: dict[int, VoronoiCell], refinement_steps: int, width: 
 
 # --- Plotting Functions ---
 
-# --- Debug Plotting Function ---
-
-def debug_plot(polygons: List[Polygon], points: Optional[np.ndarray] = None):
-    """
-    Plot the polygons and points for debugging purposes.
-
-    Args:
-        polygons (List[Polygon]): List of polygons to plot.
-        points (np.ndarray, optional): Points to plot (if any).
-    """
-    fig, ax = plt.subplots()
-    for poly in polygons:
-        x, y = poly.exterior.xy
-        ax.fill(x, y, alpha=0.5, fc='b', ec='black')
-    
-    if points is not None:
-        ax.scatter(points[:, 0], points[:, 1], color='red', zorder=5)
-    
-    ax.set_aspect('equal')
-    plt.show()
-
-def plot_polygons(polygons: List[VoronoiCell], show_ids: bool = True):
-    """
-    Plot a list of polygons using matplotlib.
-
-    Args:
-        polygons (List[Polygon]): List of polygons to plot.
-    """
-    fig, ax = plt.subplots()
-    for cell in polygons:
-        if isinstance(cell.polygon, MultiPolygon):
-            # Use unary_union to merge MultiPolygon into a single Polygon
-            cell.polygon = unary_union(cell.polygon)
-        if isinstance(cell.polygon, MultiPolygon):
-            # draw all subpolygons individually in red
-            for poly in cell.polygon.geoms:
-                x, y = poly.exterior.xy
-                ax.fill(x, y, alpha=0.5, fc='#dd0000', ec='black')
-                x, y = poly.centroid.xy
-                ax.text(x[0], y[0], str(cell.id), fontsize=8, ha='center', va='center')
-        else:
-            x, y = cell.polygon.exterior.xy
-            ax.fill(x, y, alpha=0.5, fc='#5588ff', ec='black')
-            # draw id on the center of the cell
-            x, y = cell.polygon.centroid.xy
-            if show_ids:
-                ax.text(x[0], y[0], str(cell.id), fontsize=8, ha='center', va='center')
-    ax.set_aspect('equal')
-    plt.subplots_adjust(left=0.03, right=0.99, top=0.99, bottom=0.02)
-    
-    plt.show()
 
 # --- Main Function ---
 
 def generate_puzzle(
-        grid_size: Tuple[int, int],
+        grid_size: tuple[int, int],
         num_points: int,
         width: float,
         height: float, 
         refinement_steps: int = 0,
-        min_area: Optional[float] = None, 
-        max_aspect_ratio: Optional[float] = None,
-        target_count: Optional[int] = None) -> List[Polygon]:
+        min_area: float = None, 
+        max_aspect_ratio: float = None,
+        target_count: int = None) -> list[VoronoiCell]:
     """
     Generate a custom puzzle layout with Voronoi-based irregular pieces.
 
@@ -504,7 +429,7 @@ def generate_puzzle(
         target_count (int, optional): Target number of pieces in the puzzle.
 
     Returns:
-        List[Polygon]: List of polygons representing the final puzzle pieces.
+        list[Polygon]: List of polygons representing the final puzzle pieces.
     """
     points = generate_random_points(grid_size, num_points)
     points = scale_to_bounds(points, grid_size, width, height)
@@ -542,13 +467,53 @@ if __name__ == "__main__":
     # seed = 5
     np.random.seed(seed)
     print(f"Random seed: {seed}")
+    ##### settings for large puzzle:
     grid_size = (50, 40)
     num_points_per_cell = 1
-    width, height = 40.0, 30.0
+    width, height = 70.0, 50.0
     refinement_steps = 20
     min_area = .5
     max_aspect_ratio = 2.0
-    target_count = 1000
+    target_count = 800
+    ##### test settings for small puzzle:
+    # grid_size = (15, 10)
+    # num_points_per_cell = 1
+    # width, height = 32.0, 20.0
+    # refinement_steps = 20
+    # min_area = .5
+    # max_aspect_ratio = 2.0
+    # target_count = 100
 
-    puzzle = generate_puzzle(grid_size, num_points_per_cell, width, height, refinement_steps, min_area, max_aspect_ratio, target_count)
-    plot_polygons(puzzle, show_ids=False)
+    puzzle: list[VoronoiCell] = generate_puzzle(
+        grid_size,
+        num_points_per_cell,
+        width,
+        height,
+        refinement_steps,
+        min_area,
+        max_aspect_ratio,
+        target_count)
+    # plot_polygons(puzzle, show_ids=False)
+    # puzzle edges as rows ((x1, y1), (x2, y2))
+    puzzle_edges = reduce_to_edges(puzzle)
+    # plot_puzzle_edges(puzzle_edges)
+    # plt.show()
+    for edge in puzzle_edges:
+        if on_puzzle_edge(edge[0, :], edge[1, :], (0, 0, width, height)):
+            # plot straight edge
+            plt.plot(
+                edge[:, 0],
+                edge[:, 1],
+                color="#000",
+            )
+            continue
+        draw_connector(
+            edge[0, :],
+            edge[1, :],
+            show_plot=False,
+            color="#000",
+            min_scale=0.7,
+            max_scale=1.5,
+        )
+    plt.tight_layout()
+    plt.show()

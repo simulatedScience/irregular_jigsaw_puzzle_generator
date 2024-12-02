@@ -28,11 +28,10 @@ Steps 8 and 9 are currently the only way to get non-convex shapes.
 
 ## Roadmap
 - [x] Implement basic algorithm
-- [ ] Implement step 7: place connectors on edges.  
-  This can become very tedious as I likely wantto generate these interlocking connectors procedurally as well - I don't know how to do that yet.  
-  Since we store polygons, we should easily be able to iterate over edges, calculate their length and place a scaled, randomly oriented connector if the length is above a certain threshold. It may be difficult to avoid placing two connectors per edge.
+- [X] Implement step 7: place connectors on edges.  
+   Currently, connectors may overlap, creating loose pieces.
 - [ ] in steps 8 and 9, merge the adjacent piece with the longest shared edge, not to the one with the smallest area (current implementation)  
-  This modification requires finding the maximum length of shared edges between two polygons. Due to steps 6 (with multiple points) and 7 & 8, polygons are not necessarily convex, so adjacent polygons can share multiple edges.
-- [ ] split code into multiple files
+  This modification requires finding the maximum length of shared edges between two polygons. Due to steps 6 (with multiple points) and 8 & 9, polygons are not necessarily convex, so adjacent polygons can share multiple edges.
+- [X] split code into multiple files
 - [ ] avoid pieces with too thin sections:  
   For each piece calculate the minimum distance between points on the boundary that are at least 2 points apart (i.e. polygon needs at least 6 vertices). If this distance is below a threshold, merge the piece with the neighbour sharing an edge connected to one of the problematic points.
