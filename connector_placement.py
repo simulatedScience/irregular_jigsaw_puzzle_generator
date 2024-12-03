@@ -105,10 +105,11 @@ def draw_connector(
         edge_end: np.ndarray = np.array([3, 2]),
         min_scale: float = 0.5,
         max_scale: float = 1.5,
+        max_offset: float = 0.03,
         show_plot: bool = True,
         **kwargs):
     
-    connector_points: np.ndarray = new_connector()
+    connector_points: np.ndarray = new_connector(max_offset=max_offset)
     # Position connector on edge
     repositioned_connector: np.ndarray = scale_and_position_connector(
         connector_points,

@@ -27,24 +27,74 @@ def new_connector(max_offset: float = 0.03) -> np.ndarray:
     connector_points = generate_connector_points(cs_x, cs_y)
     return np.array(connector_points)
 
-def generate_fixed_pattern():
+def generate_fixed_pattern(pattern="random"):
     """
     Generates a fixed pattern of evenly spaced points along the x-axis.
     The y-coordinates start and end at 0, forming a basic wave pattern.
     """
-    points = [
-        (0., 0.),
-        # (.15, 0.),
-        (.3, 0.),
-        (.4, .15),
-        (.3, .3),
-        (.5, .4),
-        (.7, .3),
-        (.6, .15),
-        (.7, 0.),
-        # (.85, 0.),
-        (1., 0.)
-    ]
+    if pattern.lower() == "standard":
+        points = [
+            (0., 0.),
+            (.3, 0.),
+            (.4, .15),
+            (.3, .3),
+            (.5, .4),
+            (.7, .3),
+            (.6, .15),
+            (.7, 0.),
+            (1., 0.)
+        ]
+    elif pattern.lower() == "swirl":
+        points = [
+            (0., 0.),
+            (.2, -.1),
+            (.50, -.3),
+            (.70, 0.),
+            (.50, .15),
+            (.45, .05),
+            (.50, 0.), # center point
+            (.55, -.05),
+            (.50, -.15),
+            (.30, 0.),
+            (.50, .3),
+            # (.5, .3),
+            (.8, .1),
+            # (.8, 0.),
+            # (.9, -.1),
+            (1., 0.)
+        ]
+    elif pattern.lower() == "eagle":
+        points = [
+            (0., 0.),
+            (.1, -.1),
+            (.4, -.3),
+            (.4, -.1), # start left wing
+            (.3, -.05),
+            (.2, .1),
+            (.3, .1),
+            (.4, .1), # head start
+            (.5, .25), # center point
+            (.6, .25),
+            (.65, .2), # beak
+            (.55, .15),
+            (.55, .1), # head end
+            (.7, .1),
+            (.8, .1),
+            (.7, -.05),
+            (.6, -.1), # end right wing
+            (.6, -.3),
+            (.9, -.1),
+            (1., 0.),
+        ]
+        if random.random() < 0.5: # randomly flip in x-direction
+            points = [(1-x, y) for x, y in points]
+            points.reverse()
+    elif not pattern or pattern.lower() in ("none", "random"):
+        return generate_fixed_pattern(pattern=random.choice([
+            "standard",
+            "swirl",
+            "eagle",
+        ]))
     return points
 
 def add_random_offsets(points, max_offset=0.1):
@@ -115,7 +165,7 @@ def generate_and_plot_connector(n=1, max_offset=0.03):
     """
     # Step 1: Generate fixed pattern of points
     base_points = generate_fixed_pattern()
-    # plot_connector(base_points, show_plot=False, label="Base Pattern", alpha=0.4, linestyle="-", marker="o", markersize=3)
+    # plot_connector(base_points, show_plot=False, label="Base Pattern", alpha=0.7, linestyle="-", marker="o", markersize=5)
     for _ in range(n):
         # Step 2: Apply random offsets (optional for variation)
         offset_points = add_random_offsets(base_points, max_offset=max_offset)
@@ -130,4 +180,4 @@ def generate_and_plot_connector(n=1, max_offset=0.03):
     plt.show()
 
 if __name__ == "__main__":
-    generate_and_plot_connector()
+    generate_and_plot_connector(max_offset=0.03, n=1)

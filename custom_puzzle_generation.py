@@ -23,26 +23,33 @@ FAR_POINT_DISTANCE = 10000
 
 # --- Utility Functions ---
 
-def generate_random_points(grid_size: tuple[int, int], num_points: int) -> np.ndarray:
+def generate_random_points(
+        grid_size: tuple[int, int],
+        num_points: int,
+        padding: float = 0.1,
+        grid_type: str = "hex",
+    ) -> np.ndarray:
     """
     Generate random points within each cell of the grid with padding.
     
     Args:
         grid_size (tuple[int, int]): Dimensions of the grid in (rows, columns).
         num_points (int): Number of random points to generate.
+        padding (float): Padding to avoid points too close to the edges.
 
     Returns:
         np.ndarray: Array of random points of shape (num_points, 2).
     """
     rows, cols = grid_size
     points = []
-    padding = 0.1
 
     for i in range(rows):
         for j in range(cols):
             for _ in range(num_points):
                 x = i + padding + np.random.random() * (1 - 2 * padding)
                 y = j + padding + np.random.random() * (1 - 2 * padding)
+                if i%2 == 0 and grid_type.lower() in "hexagonal":
+                    x += .5
                 points.append([x, y])
     
     # add extreme points along major axes to ensure all relevant cells are closed
@@ -468,21 +475,29 @@ if __name__ == "__main__":
     np.random.seed(seed)
     print(f"Random seed: {seed}")
     ##### settings for large puzzle:
-    grid_size = (35, 25)
-    num_points_per_cell = 1
-    width, height = 70.0, 50.0
-    refinement_steps = 20
-    min_area = .5
-    max_aspect_ratio = 2.0
-    target_count = 500
-    ##### test settings for small puzzle:
-    # grid_size = (15, 10)
+    # grid_size = (35, 25)
     # num_points_per_cell = 1
-    # width, height = 32.0, 20.0
+    # width, height = 70.0, 50.0
     # refinement_steps = 20
     # min_area = .5
     # max_aspect_ratio = 2.0
-    # target_count = 100
+    # target_count = 500
+    ##### small puzzle:
+    grid_size = (15, 10)
+    num_points_per_cell = 1
+    width, height = 32.0, 20.0
+    refinement_steps = 20
+    min_area = .5
+    max_aspect_ratio = 2.0
+    target_count = 100
+    ##### test settings for tiny puzzle:
+    # grid_size = (6, 6)
+    # num_points_per_cell = 1
+    # width, height = 20.0, 20.0
+    # refinement_steps = 20
+    # min_area = .5
+    # max_aspect_ratio = 2.0
+    # target_count = 25
 
     puzzle: list[VoronoiCell] = generate_puzzle(
         grid_size,
@@ -512,8 +527,11 @@ if __name__ == "__main__":
             edge[0, :],
             edge[1, :],
             show_plot=False,
-            min_scale=0.7,
-            max_scale=1.1,
+            min_scale=1.1,
+            max_scale=1.6,
+            max_offset=0.02,
+            # min_scale=0.7,
+            # max_scale=1.1,
             color="#000",
             linewidth=0.5,
         )
