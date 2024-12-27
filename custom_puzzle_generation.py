@@ -483,13 +483,13 @@ if __name__ == "__main__":
     # max_aspect_ratio = 2.0
     # target_count = 500
     ##### small puzzle:
-    grid_size = (15, 10)
-    num_points_per_cell = 1
-    width, height = 32.0, 20.0
-    refinement_steps = 20
-    min_area = .5
-    max_aspect_ratio = 2.0
-    target_count = 100
+    # grid_size = (15, 10)
+    # num_points_per_cell = 1
+    # width, height = 32.0, 20.0
+    # refinement_steps = 20
+    # min_area = .5
+    # max_aspect_ratio = 2.0
+    # target_count = 100
     ##### test settings for tiny puzzle:
     # grid_size = (6, 6)
     # num_points_per_cell = 1
@@ -498,6 +498,13 @@ if __name__ == "__main__":
     # min_area = .5
     # max_aspect_ratio = 2.0
     # target_count = 25
+    grid_size = (15, 5)
+    num_points_per_cell = 1
+    width, height = 24.0, 8.0
+    refinement_steps = 20
+    min_area = .5
+    max_aspect_ratio = 2.0
+    target_count = 50
 
     puzzle: list[VoronoiCell] = generate_puzzle(
         grid_size,
@@ -529,7 +536,7 @@ if __name__ == "__main__":
             show_plot=False,
             min_scale=1.1,
             max_scale=1.6,
-            max_offset=0.02,
+            max_offset=0.01,
             # min_scale=0.7,
             # max_scale=1.1,
             color="#000",

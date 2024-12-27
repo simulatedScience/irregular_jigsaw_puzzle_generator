@@ -27,7 +27,7 @@ def new_connector(max_offset: float = 0.03) -> np.ndarray:
     connector_points = generate_connector_points(cs_x, cs_y)
     return np.array(connector_points)
 
-def generate_fixed_pattern(pattern="random"):
+def generate_fixed_pattern(pattern="dragon"):
     """
     Generates a fixed pattern of evenly spaced points along the x-axis.
     The y-coordinates start and end at 0, forming a basic wave pattern.
@@ -89,11 +89,34 @@ def generate_fixed_pattern(pattern="random"):
         if random.random() < 0.5: # randomly flip in x-direction
             points = [(1-x, y) for x, y in points]
             points.reverse()
+    elif pattern.lower() == "dragon":
+        points = [
+            (0.0, 0.0),
+            (.40, 0.0),
+            (.35, .10),
+            (.20, .15),
+            # (.25, .20),
+            (.30, .2),
+            (.50, .10),
+            (.50, .35),
+            (.70, .30),
+            (.90, .175),
+            (.95, .10),
+            (.90, .125),
+            (.85, .05),
+            (.75, .10),
+            (.70, 0.0),
+            (1.0, 0.0),
+        ]
+        if random.random() < 0.5:
+            points = [(1-x, y) for x, y in points]
+            points.reverse()
     elif not pattern or pattern.lower() in ("none", "random"):
         return generate_fixed_pattern(pattern=random.choice([
             "standard",
             "swirl",
             "eagle",
+            "dragon",
         ]))
     return points
 
@@ -165,7 +188,7 @@ def generate_and_plot_connector(n=1, max_offset=0.03):
     """
     # Step 1: Generate fixed pattern of points
     base_points = generate_fixed_pattern()
-    # plot_connector(base_points, show_plot=False, label="Base Pattern", alpha=0.7, linestyle="-", marker="o", markersize=5)
+    plot_connector(base_points, show_plot=False, label="Base Pattern", alpha=0.7, linestyle="-", marker="o", markersize=5)
     for _ in range(n):
         # Step 2: Apply random offsets (optional for variation)
         offset_points = add_random_offsets(base_points, max_offset=max_offset)
@@ -180,4 +203,4 @@ def generate_and_plot_connector(n=1, max_offset=0.03):
     plt.show()
 
 if __name__ == "__main__":
-    generate_and_plot_connector(max_offset=0.03, n=1)
+    generate_and_plot_connector(max_offset=0.01, n=1)
