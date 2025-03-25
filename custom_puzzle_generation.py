@@ -498,13 +498,13 @@ if __name__ == "__main__":
     # min_area = .5
     # max_aspect_ratio = 2.0
     # target_count = 25
-    grid_size = (15, 5)
+    grid_size = (10, 8)
     num_points_per_cell = 1
-    width, height = 24.0, 8.0
+    width, height = 30.0, 20.0
     refinement_steps = 20
     min_area = .5
     max_aspect_ratio = 2.0
-    target_count = 50
+    target_count = 60
 
     puzzle: list[VoronoiCell] = generate_puzzle(
         grid_size,

@@ -27,7 +27,7 @@ def new_connector(max_offset: float = 0.03) -> np.ndarray:
     connector_points = generate_connector_points(cs_x, cs_y)
     return np.array(connector_points)
 
-def generate_fixed_pattern(pattern="dragon"):
+def generate_fixed_pattern(pattern="standard"):
     """
     Generates a fixed pattern of evenly spaced points along the x-axis.
     The y-coordinates start and end at 0, forming a basic wave pattern.
